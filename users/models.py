@@ -17,10 +17,3 @@ class User(models.Model):
     image = models.ImageField(null=True, blank=True)
 
 
-class Vehicle(models.Model):
-    make = models.CharField(max_length=40)
-    model = models.CharField(max_length=40)
-    color = models.CharField(max_length=30)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
