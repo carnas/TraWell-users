@@ -4,7 +4,8 @@ from users.models import User
 
 
 class Vehicle(models.Model):
-    make = models.CharField(max_length=40)
-    model = models.CharField(max_length=40)
-    color = models.CharField(max_length=30)
+    vehicle_id = models.AutoField(primary_key=True)
+    make = models.CharField(max_length=20)
+    model = models.CharField(max_length=30)
+    color = models.CharField(max_length=20)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
