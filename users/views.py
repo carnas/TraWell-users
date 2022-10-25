@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.http import JsonResponse
+from rest_framework import status
 from .serializers import UserSerializer
 from users.models import User
 
@@ -13,11 +14,15 @@ class UserView(APIView):
         return users
 
     def get(self, request, *args, **kwargs):
-        id = request.query_params['id']
-        user = User.objects.get(user_id=id)
+        try:
+            id = request.query_params['id']
+            user = User.objects.get(user_id=id)
+        except User.DoesNotExist:
+            return JsonResponse(status=status.HTTP_404_NOT_FOUND, data=f'User with id={id} not found', safe=False)
+
         serializer = UserSerializer(user)
 
-        return Response(serializer.data)
+        return JsonResponse(status=status.HTTP_200_OK, data=serializer.data)
 
     @classmethod
     def get_extra_actions(cls):
