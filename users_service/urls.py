@@ -20,7 +20,7 @@ from rest_framework import routers
 from users.views import UserView
 import users
 from users import urls
-from vehicles.views import VehicleView
+import vehicles.views
 import vehicles
 from vehicles import urls
 
