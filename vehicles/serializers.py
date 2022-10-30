@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from vehicles.models import Vehicle
+from users.models import User
 
 
 class UserNestedSerializer(serializers.ModelSerializer):
@@ -16,3 +17,9 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
         fields = ('vehicle_id', 'make', 'model', 'color', 'user')
+
+
+class VehicleWithoutUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vehicle
+        fields = ('vehicle_id', 'make', 'model', 'color')
