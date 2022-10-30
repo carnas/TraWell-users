@@ -7,7 +7,7 @@ ISSUER_CLAIM = 'http://localhost:8403/auth/realms/TraWell'
 ALGORITHMS = ['RS256']
 JWT_OPTIONS = {
         'verify_signature': False,
-        'verify_exp': True,
+        'verify_exp': False,
         'verify_iss': True,
         'verify_iat': True,
         'verify_aud': False,
@@ -43,13 +43,16 @@ def decode_token(token: str):
 def extract_user_data(data: str):
     try:
         user_data = {'first_name': data['given_name'],
-                     'last_name': data["family_name"],
+                     'last_name': data['family_name'],
                      'email': data['email'],
                      'date_of_birth': data['date_of_birth'],
                      'user_type': rewrite_user_type(data['user_type']),
                      'facebook': data['facebook'],
                      'instagram': data['instagram'],
-                     'avatar': data['picture']}
+                     'avatar': ''}
+        if 'picture' in data.keys():
+            user_data['avatar'] = data['picture']
+
         return user_data
     except KeyError:
         return {'error': 'User data are not complete'}
