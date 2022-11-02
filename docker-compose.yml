@@ -20,6 +20,29 @@ services:
       - "8003:8003"
     depends_on:
       - db
+      - rabbitmq2
+
+#  rabbitmq2:
+#    container_name: rabbitmq2
+#    domainname: rabbitmq.com
+#    image: rabbitmq:3.8-management-alpine
+#    environment:
+#      - RABBITMQ_DEFAULT_USER=admin
+#      - RABBITMQ_DEFAULT_PASS=admin
+#      - RABBITMQ_USERNAME=admin
+#      - RABBITMQ_PASSWORD=admin
+#      - RABBITMQ_DEFAULT_VHOST=/
+##      - AMQP_SERVER_URL=amqp://guest:guest@rabbitmq:5672
+#    ports:
+#      # AMQP protocol port
+#      - '5672:5672'
+#      # HTTP management UI
+#      - '15672:15672'
+#    volumes:
+#      - ./rabbitmq/log/:/var/log/rabbitmq/
+#      - ./rabbitmq/data/:/var/lib/rabbitmq/
+#    networks:
+#      - rabbitmq_network
 
 volumes:
   postgres_data:

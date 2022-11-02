@@ -13,7 +13,7 @@ def get_user_data_from_token(token: str):
 
 def decode_token(token: str):
     try:
-        data = jwt.decode(token, PUBLIC_KEY, algorithms=ALGORITHMS, issuer=ISSUER_CLAIM, options=JWT_OPTIONS)
+        data = jwt.decode(token.split(' ')[1], PUBLIC_KEY, issuer=ISSUER_CLAIM, algorithms=["RS256"], audience="account")
         return data
     except ValueError:
         return {'error': 'Public key is invalid'}

@@ -1,6 +1,9 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import VehicleWithoutUserSerializer
+
+from .producer import publish
+from .serializers import VehicleWithoutUserSerializer, VehicleSerializer
 from users.models import User
 from vehicles.models import Vehicle
 from rest_framework.decorators import api_view
@@ -31,6 +34,10 @@ def user_vehicles(request, user_id):
                                                  color=vehicle_data['color'], user=user)
                 vehicle.save()
                 serializer = VehicleWithoutUserSerializer(vehicle)
+
+
+                publish('vehicle_created', VehicleSerializer(vehicle).data)
+
                 return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
             except KeyError:
                 return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data="Wrong parameters", safe=False)
