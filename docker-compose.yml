@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  db:
+  db_users:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -11,16 +11,23 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5435:5432"
-  web:
-    build: .
-    command: bash -c "pip install -r requirements.txt && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8003"
-    volumes:
-      - .:/users
-    ports:
-      - "8003:8003"
-    depends_on:
-      - db
-      - rabbitmq2
+    networks:
+      - rabbitmq_network
+
+networks:
+  rabbitmq_network:
+    driver: bridge
+
+#  web_users:
+#    build: .
+#    command: bash -c "pip install -r requirements.txt && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8003"
+#    volumes:
+#      - .:/users
+#    ports:
+#      - "8003:8003"
+#    depends_on:
+#      - db
+#      - rabbitmq2
 
 #  rabbitmq2:
 #    container_name: rabbitmq2
