@@ -1,6 +1,6 @@
 import jwt
 from email_validator import validate_email, EmailNotValidError
-from utils.variables import PUBLIC_KEY, JWT_OPTIONS, ALGORITHMS, ISSUER_CLAIM
+from utils.variables import PUBLIC_KEY, JWT_OPTIONS, ALGORITHMS, ISSUER_CLAIM, AUDIENCE_CLAIM
 
 
 def get_user_data_from_token(token: str):
@@ -13,7 +13,8 @@ def get_user_data_from_token(token: str):
 
 def decode_token(token: str):
     try:
-        data = jwt.decode(token, PUBLIC_KEY, algorithms=ALGORITHMS, issuer=ISSUER_CLAIM, options=JWT_OPTIONS)
+        data = jwt.decode(token, PUBLIC_KEY, algorithms=ALGORITHMS, issuer=ISSUER_CLAIM,
+                          audience=AUDIENCE_CLAIM, options=JWT_OPTIONS)
         return data
     except ValueError:
         return {'error': 'Public key is invalid'}
