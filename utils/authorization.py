@@ -10,8 +10,11 @@ def is_authorized(request):
         return False
 
     try:
+        print(token)
+
         jwt.decode(token, PUBLIC_KEY, algorithms=ALGORITHMS, options=JWT_OPTIONS)
         return True
     except jwt.exceptions.DecodeError:
+        print('decode')
         return False
 

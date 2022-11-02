@@ -1,10 +1,10 @@
-PUBLIC_KEY = '-----BEGIN RSA PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsigrn1IczQr4Ywmd+30WkyQAAV6tih58ENcCikivikUdLWN1HBWNjU53US9YXiJThpSNXSKeRMJ95f9OWj4uaCHIeN4hKrOsdnLoETiaDEGrKymzcLFHBhaVK7Cpna3zUUJWDajRjlmNHvLa+8IIApeF0e5pLCgXbeGyxnSmLhrhftVmuKJ2xEeAul/nQV3UGD+Qg/sKTpI7wdDARhOaQ0EjX/gO7uYKQ+pDVwlfgFDuJaJ/LjgQpe4zRNS3VD8X5lV+uQFkTJC2OQlPEunRFjQe6s/iR2IEGwNx3oISwCZsm7FyGZ1wTnCqO4rq39PkffRSA696HfJDszGo6c6hyQIDAQAB\n-----END RSA PUBLIC KEY-----'
+PUBLIC_KEY = '-----BEGIN RSA PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzZT9ZpwATjHC8Dor9BLI/iKKJq+DKFeAF03/kjY605453dLRLPkWDEMn+orU69/SiLKBGy94N1m1IjAY6YE7vl31Qr5kzU8MRKe1My55jWcGhxBOMr6a2VZ8RFa0iOE2M3LC0NwoJKQKB7CwTGjP62MTDNRAp/BZcJACZOB7XBLBLhl55/1Es57/Zl8uhSFfeofaol5U9Kk2xN+1OVJ1anJdIzcT1YOTTemiNAwVEFt2ACN2GLK0X7UtG+POW6QB/ztBPvsZYo27ZHaTOiCNyxREWFpJ4EN3pVakwqP336hObSQS6XSjrbZjxjGUoY0r8rjw1awMsW2w1c23KsBf1QIDAQAB\n-----END RSA PUBLIC KEY-----'
 ISSUER_CLAIM = 'http://localhost:8403/auth/realms/TraWell'
 ALGORITHMS = ['RS256']
 JWT_OPTIONS = {
-        'verify_signature': False,
-        'verify_exp': True,
-        'verify_iss': True,
-        'verify_iat': True,
-        'verify_aud': False,
-    }
+    'verify_signature': False,
+    'verify_exp': True,
+    'verify_iss': True,
+    'verify_iat': True,
+    'verify_aud': False,
+}
