@@ -68,3 +68,25 @@ def check_user(request):
             return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data=user_data['error'], safe=False)
     else:
         return JsonResponse(status=status.HTTP_401_UNAUTHORIZED, data='Not authorized', safe=False)
+
+
+@api_view(['GET'])
+def get_me(request):
+    if is_authorized(request):
+        token = request.headers['Authorization'].split(' ')[1]
+        user_data = users_utils.get_user_data_from_token(token)
+        if 'error' not in user_data.keys():
+            email = user_data['email']
+            if users_utils.is_email_valid(email):
+                try:
+                    user = User.objects.get(email=email)
+                    return JsonResponse(status=status.HTTP_200_OK, data={'user_id': user.user_id})
+                except User.DoesNotExist:
+                    return JsonResponse(status=status.HTTP_404_NOT_FOUND, data=f'User not found',
+                                        safe=False)
+            else:
+                return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data=f"Email: {email} is not valid", safe=False)
+        else:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data=user_data['error'], safe=False)
+    else:
+        return JsonResponse(status=status.HTTP_401_UNAUTHORIZED, data='Not authorized', safe=False)
