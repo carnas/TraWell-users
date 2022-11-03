@@ -11,8 +11,7 @@ from utils.authorization import is_authorized
 
 @api_view(['GET', 'POST'])
 def user_vehicles(request, user_id):
-    authorized = is_authorized(request)
-    if authorized:
+    if is_authorized(request):
         try:
             user = User.objects.get(user_id=user_id)
         except User.DoesNotExist:

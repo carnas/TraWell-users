@@ -12,8 +12,7 @@ from utils import users_utils
 
 @api_view(['GET'])
 def get_user(request, user_id):
-    authorized = is_authorized(request)
-    if authorized:
+    if is_authorized(request):
         try:
             user = User.objects.get(user_id=user_id)
         except User.DoesNotExist:
@@ -28,9 +27,8 @@ def get_user(request, user_id):
 
 @api_view(['GET'])
 def check_user(request):
-    authorized = is_authorized(request)
-    if authorized:
-        token = request.headers['Authorization']
+    if is_authorized(request):
+        token = request.headers['Authorization'].split(' ')[1]
         user_data = users_utils.get_user_data_from_token(token)
         if 'error' not in user_data.keys():
             email = user_data['email']
