@@ -8,8 +8,8 @@ from django.http import JsonResponse
 from rest_framework import status
 from utils.authorization import is_authorized
 from utils import users_utils
-from utils.variables import PUBLIC_KEY, JWT_OPTIONS, ALGORITHMS, ISSUER_CLAIM, AUDIENCE_CLAIM
 import jwt
+import os
 
 
 @api_view(['GET', 'POST'])
@@ -47,8 +47,14 @@ def vehicle_details(request, car_id):
     if is_authorized(request):
         token = request.headers['Authorization'].split(' ')[1]
         try:
-            email = jwt.decode(token, PUBLIC_KEY, algorithms=ALGORITHMS, issuer=ISSUER_CLAIM,
-                               audience=AUDIENCE_CLAIM, options=JWT_OPTIONS)['email']
+            public_key = f"""-----BEGIN RSA PUBLIC KEY-----\n{os.environ.get("TOKEN_KEY")}\n-----END RSA PUBLIC KEY-----"""
+            issuer_claim = os.environ.get("ISSUER_CLAIM")
+            email = jwt.decode(token, public_key, algorithms=['RS256'], issuer=issuer_claim,
+                               audience='account', options={'verify_signature': True,
+                                                            'verify_exp': True,
+                                                            'verify_iss': True,
+                                                            'verify_iat': True,
+                                                            'verify_aud': True})['email']
             user = User.objects.get(email=email)
             vehicle = Vehicle.objects.get(vehicle_id=car_id)
             does_belong_to_user = vehicle.user.user_id == user.user_id
