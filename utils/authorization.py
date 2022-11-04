@@ -1,7 +1,6 @@
 import jwt
+import os
 from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidIssuerError, InvalidAudienceError, InvalidIssuedAtError, InvalidSignatureError
-
-from utils.variables import PUBLIC_KEY, ALGORITHMS, JWT_OPTIONS, ISSUER_CLAIM, AUDIENCE_CLAIM
 
 
 def is_authorized(request):
@@ -11,8 +10,14 @@ def is_authorized(request):
         return False
 
     try:
-        jwt.decode(token, PUBLIC_KEY, algorithms=ALGORITHMS, issuer=ISSUER_CLAIM, audience=AUDIENCE_CLAIM,
-                   options=JWT_OPTIONS)
+        public_key = f"""-----BEGIN RSA PUBLIC KEY-----\n{os.environ.get("TOKEN_KEY")}\n-----END RSA PUBLIC KEY-----"""
+        issuer_claim = os.environ.get("ISSUER_CLAIM")
+        jwt.decode(token, public_key, algorithms=['RS256'], issuer=issuer_claim,
+                   audience='account', options={'verify_signature': True,
+                                                'verify_exp': True,
+                                                'verify_iss': True,
+                                                'verify_iat': True,
+                                                'verify_aud': True})
         return True
     except (DecodeError, ExpiredSignatureError, InvalidIssuerError, InvalidAudienceError, InvalidIssuedAtError, InvalidSignatureError):
         return False
