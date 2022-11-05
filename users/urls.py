@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import get_user, check_user, get_me
+
+from .views import check_user, get_me, get_user
 
 urlpatterns = [
     path('<int:user_id>', get_user),

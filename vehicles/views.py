@@ -1,24 +1,33 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from .serializers import VehicleWithoutUserSerializer
-from users.models import User
-from vehicles.models import Vehicle
-from rest_framework.decorators import api_view
-from django.http import JsonResponse
-from rest_framework import status
-from utils.authorization import is_authorized
-from utils import users_utils
-import jwt
 import os
+
+import jwt
+from django.http import JsonResponse
+from django.shortcuts import render
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from users.models import User
+from utils import users_utils
+from utils.authorization import is_authorized
+
+from vehicles.models import Vehicle
+
+from .serializers import VehicleWithoutUserSerializer
 
 
 @api_view(['GET', 'POST'])
 def user_vehicles(request, user_id):
     if is_authorized(request):
+        token = request.headers['Authorization'].split(' ')[1]
         try:
             user = User.objects.get(user_id=user_id)
+            email = users_utils.decode_token(token)['email']
+            if user.email != email:
+                return JsonResponse(status=HTTP_403_FORBIDDEN, data=f'Not allowed', safe=False)
         except User.DoesNotExist:
             return JsonResponse(status=status.HTTP_404_NOT_FOUND, data=f'User with id={user_id} not found', safe=False)
+        except KeyError:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data='Something went wrong with user', safe=False)
 
         if request.method == 'GET':
             vehicles = Vehicle.objects.filter(user=user)
@@ -47,21 +56,14 @@ def vehicle_details(request, car_id):
     if is_authorized(request):
         token = request.headers['Authorization'].split(' ')[1]
         try:
-            public_key = f"""-----BEGIN RSA PUBLIC KEY-----\n{os.environ.get("TOKEN_KEY")}\n-----END RSA PUBLIC KEY-----"""
-            issuer_claim = os.environ.get("ISSUER_CLAIM")
-            email = jwt.decode(token, public_key, algorithms=['RS256'], issuer=issuer_claim,
-                               audience='account', options={'verify_signature': True,
-                                                            'verify_exp': True,
-                                                            'verify_iss': True,
-                                                            'verify_iat': True,
-                                                            'verify_aud': True})['email']
+            email = users_utils.decode_token(token)['email']
             user = User.objects.get(email=email)
             vehicle = Vehicle.objects.get(vehicle_id=car_id)
             does_belong_to_user = vehicle.user.user_id == user.user_id
             if does_belong_to_user:
                 if request.method == 'DELETE':
                     vehicle.delete()
-                    return JsonResponse(status=status.HTTP_200_OK, data=f'Car with id={car_id} deleted succesfully',
+                    return JsonResponse(status=status.HTTP_200_OK, data=f'Car with id={car_id} deleted successfully',
                                         safe=False)
                 elif request.method == 'PATCH':
                     serializer = VehicleWithoutUserSerializer(vehicle, data=request.data, partial=True)

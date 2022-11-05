@@ -1,7 +1,7 @@
 import factory.django
+from users.factories import UserFactory
 
 from . import models
-from users.factories import UserFactory
 
 vehicles_makes = ['audi', 'bmw', 'citroen', 'dacia', 'dodge', 'fiat', 'ford', 'hyundai', 'kia', 'mercedes', 'nissan',
              'opel', 'peugeot', 'renault', 'seat', 'skoda', 'toyota', 'volkswagen', 'volvo']
