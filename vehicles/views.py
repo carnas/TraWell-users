@@ -18,6 +18,7 @@ from .serializers import VehicleWithoutUserSerializer
 @api_view(['GET', 'POST'])
 def user_vehicles(request, user_id):
     if is_authorized(request):
+        token = request.headers['Authorization'].split(' ')[1]
         try:
             user = User.objects.get(user_id=user_id)
             email = users_utils.decode_token(token)['email']
