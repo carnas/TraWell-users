@@ -17,8 +17,13 @@ def user_vehicles(request, user_id):
     if is_authorized(request):
         try:
             user = User.objects.get(user_id=user_id)
+            email = users_utils.decode_token(token)['email']
+            if user.email != email:
+                return JsonResponse(status=HTTP_403_FORBIDDEN, data=f'Not allowed', safe=False)
         except User.DoesNotExist:
             return JsonResponse(status=status.HTTP_404_NOT_FOUND, data=f'User with id={user_id} not found', safe=False)
+        except KeyError:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data='Something went wrong with user', safe=False)
 
         if request.method == 'GET':
             vehicles = Vehicle.objects.filter(user=user)
