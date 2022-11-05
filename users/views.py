@@ -1,13 +1,14 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from rest_framework import status, permissions
-from rest_framework.decorators import api_view
-from .serializers import UserSerializer
-from users.models import User
-from utils.authorization import is_authorized
 from django.core.exceptions import ValidationError
-
+from django.http import JsonResponse
+from django.shortcuts import render
+from rest_framework import permissions, status
+from rest_framework.decorators import api_view
 from utils import users_utils
+from utils.authorization import is_authorized
+
+from users.models import User
+
+from .serializers import UserSerializer
 
 
 @api_view(['GET'])

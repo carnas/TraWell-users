@@ -1,10 +1,10 @@
-import factory.django
-import factory.fuzzy
 import datetime
 from datetime import timezone
 
-from . import models
+import factory.django
+import factory.fuzzy
 
+from . import models
 
 user_types = ['private', 'company']
 urls = ['', 'http://www.armstrong-foster.com/', 'https://www.reyes.biz/', 'https://www.collinsaerospace.com/',

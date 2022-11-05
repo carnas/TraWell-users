@@ -1,15 +1,18 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from .serializers import VehicleWithoutUserSerializer
-from users.models import User
-from vehicles.models import Vehicle
-from rest_framework.decorators import api_view
-from django.http import JsonResponse
-from rest_framework import status
-from utils.authorization import is_authorized
-from utils import users_utils
-import jwt
 import os
+
+import jwt
+from django.http import JsonResponse
+from django.shortcuts import render
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from users.models import User
+from utils import users_utils
+from utils.authorization import is_authorized
+
+from vehicles.models import Vehicle
+
+from .serializers import VehicleWithoutUserSerializer
 
 
 @api_view(['GET', 'POST'])

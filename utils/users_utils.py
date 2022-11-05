@@ -1,6 +1,7 @@
-import jwt
 import os
-from email_validator import validate_email, EmailNotValidError
+
+import jwt
+from email_validator import EmailNotValidError, validate_email
 
 
 def get_user_data_from_token(token: str):

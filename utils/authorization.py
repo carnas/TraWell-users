@@ -1,6 +1,9 @@
-import jwt
 import os
-from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidIssuerError, InvalidAudienceError, InvalidIssuedAtError, InvalidSignatureError
+
+import jwt
+from jwt.exceptions import (DecodeError, ExpiredSignatureError,
+                            InvalidAudienceError, InvalidIssuedAtError,
+                            InvalidIssuerError, InvalidSignatureError)
 
 
 def is_authorized(request):

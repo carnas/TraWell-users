@@ -1,7 +1,7 @@
 from rest_framework import serializers
+from users.models import User
 
 from vehicles.models import Vehicle
-from users.models import User
 
 
 class UserNestedSerializer(serializers.ModelSerializer):
