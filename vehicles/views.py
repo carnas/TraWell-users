@@ -42,7 +42,7 @@ def user_vehicles(request, user_id):
         return JsonResponse(status=status.HTTP_401_UNAUTHORIZED, data='Not authorized', safe=False)
 
 
-@api_view(['DELETE'])
+@api_view(['DELETE', 'PATCH'])
 def vehicle_details(request, car_id):
     if is_authorized(request):
         token = request.headers['Authorization'].split(' ')[1]
@@ -59,9 +59,17 @@ def vehicle_details(request, car_id):
             vehicle = Vehicle.objects.get(vehicle_id=car_id)
             does_belong_to_user = vehicle.user.user_id == user.user_id
             if does_belong_to_user:
-                vehicle.delete()
-                return JsonResponse(status=status.HTTP_200_OK, data=f'Car with id={car_id} deleted succesfully',
-                                    safe=False)
+                if request.method == 'DELETE':
+                    vehicle.delete()
+                    return JsonResponse(status=status.HTTP_200_OK, data=f'Car with id={car_id} deleted succesfully',
+                                        safe=False)
+                elif request.method == 'PATCH':
+                    serializer = VehicleWithoutUserSerializer(vehicle, data=request.data, partial=True)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
+                    else:
+                        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data="Wrong parameters", safe=False)
             else:
                 return JsonResponse(status=status.HTTP_400_BAD_REQUEST,
                                     data=f'Vehicle with id={car_id} does not belong to user with id={user.user_id}',
