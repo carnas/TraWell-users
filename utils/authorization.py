@@ -22,7 +22,8 @@ def is_authorized(request):
                                                 'verify_iat': True,
                                                 'verify_aud': True})
         return True
-    except (DecodeError, ExpiredSignatureError, InvalidIssuerError, InvalidAudienceError, InvalidIssuedAtError, InvalidSignatureError):
+    except (DecodeError, ExpiredSignatureError, InvalidIssuerError, InvalidAudienceError, InvalidIssuedAtError, 
+            InvalidSignatureError):
         return False
 
 
