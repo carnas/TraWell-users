@@ -1,10 +1,10 @@
-import factory.django
-import factory.fuzzy
 import datetime
 from datetime import timezone
 
-from . import models
+import factory.django
+import factory.fuzzy
 
+from . import models
 
 user_types = ['private', 'company']
 urls = ['', 'http://www.armstrong-foster.com/', 'https://www.reyes.biz/', 'https://www.collinsaerospace.com/',
@@ -25,6 +25,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         datetime.datetime(1901, 1, 1, tzinfo=datetime.timezone.utc),
         datetime.datetime(2010, 12, 31, 20, tzinfo=datetime.timezone.utc)
     )
+    avg_rate = factory.Faker('pydecimal', left_digits=1, right_digits=2, min_value=1, max_value=5)
     user_type = factory.Faker('random_element', elements=user_types)
     facebook = factory.Faker('random_element', elements=urls)
     instagram = factory.Faker('random_element', elements=urls)

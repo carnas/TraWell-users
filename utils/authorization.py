@@ -1,6 +1,11 @@
-import jwt
+import os
 
-from utils.variables import PUBLIC_KEY, ALGORITHMS, JWT_OPTIONS
+import jwt
+from jwt.exceptions import (DecodeError, ExpiredSignatureError,
+                            InvalidAudienceError, InvalidIssuedAtError,
+                            InvalidIssuerError, InvalidSignatureError)
+
+from utils import users_utils
 
 
 def is_authorized(request):
@@ -9,11 +14,11 @@ def is_authorized(request):
     except KeyError:
         return False
 
-    try:
-        # print(token)
-        jwt.decode(token, PUBLIC_KEY, algorithms=["RS256"], audience="account")
-        return True
-    except jwt.exceptions.DecodeError:
-        print('decode')
+    data = users_utils.decode_token(token)
+    if 'error' in data.keys():
         return False
+
+    return True
+
+
 
