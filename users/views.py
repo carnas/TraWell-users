@@ -8,20 +8,38 @@ from utils.authorization import is_authorized
 
 from users.models import User
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserToUpdateSerializer
 
 
-@api_view(['GET'])
-def get_user(request, user_id):
+@api_view(['GET', 'PATCH'])
+def user_details(request, user_id):
     if is_authorized(request):
         try:
             user = User.objects.get(user_id=user_id)
         except User.DoesNotExist:
             return JsonResponse(status=status.HTTP_404_NOT_FOUND, data=f'User with id={user_id} not found', safe=False)
-
-        serializer = UserSerializer(user)
-
-        return JsonResponse(status=status.HTTP_200_OK, data=serializer.data)
+        if request.method == 'GET':
+            serializer = UserSerializer(user)
+            return JsonResponse(status=status.HTTP_200_OK, data=serializer.data)
+        elif request.method == 'PATCH':
+            token = request.headers['Authorization'].split(' ')[1]
+            try:
+                email = users_utils.decode_token(token)['email']
+                want_to_change_sb_else_data = user.email != email
+                if want_to_change_sb_else_data:
+                    return JsonResponse(status=status.HTTP_403_FORBIDDEN,
+                                        data='No permission to change data of another person', safe=False)
+                else:
+                    serializer = UserToUpdateSerializer(user, data=request.data, partial=True)
+                    if serializer.is_valid():
+                        serializer.save()
+                        serializer = UserSerializer(user)
+                        return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
+                    else:
+                        return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data="Wrong parameters", safe=False)
+            except KeyError:
+                return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data='Something went wrong with user',
+                                    safe=False)
     else:
         return JsonResponse(status=status.HTTP_401_UNAUTHORIZED, data='Not authorized', safe=False)
 
