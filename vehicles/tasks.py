@@ -13,3 +13,13 @@ def publish_message(message):
             exchange='trawell_exchange',
             routing_key='key.vehicles',
         )
+
+
+@shared_task
+def publish_message_n(message):
+    with app.producer_pool.acquire(block=True) as producer:
+        producer.publish(
+            message,
+            exchange='trawell_exchange',
+            routing_key='notify.vehicles',
+        )

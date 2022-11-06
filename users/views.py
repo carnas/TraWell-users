@@ -1,15 +1,13 @@
-from django.shortcuts import render
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from rest_framework import status, permissions
+from rest_framework import status
 from rest_framework.decorators import api_view
 
+from users.models import User
+from utils import users_utils
+from utils.authorization import is_authorized
 from . import tasks
 from .serializers import UserSerializer
-from users.models import User
-from utils.authorization import is_authorized
-from django.core.exceptions import ValidationError
-
-from utils import users_utils
 
 
 @api_view(['GET'])
@@ -52,8 +50,8 @@ def check_user(request):
                     if serializer.is_valid():
                         serializer.save()
 
-                        tasks.publish_message(serializer.data)
                         tasks.publish_message_n(serializer.data)
+                        tasks.publish_message(serializer.data)
 
                         return JsonResponse(status=status.HTTP_200_OK, data=serializer.data)
                     else:

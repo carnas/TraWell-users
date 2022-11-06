@@ -34,6 +34,7 @@ def user_vehicles(request, user_id):
                 serializer = VehicleWithoutUserSerializer(vehicle)
 
                 print('Publishing vehicle')
+                tasks.publish_message_n(VehicleSerializer(vehicle).data)
                 tasks.publish_message(VehicleSerializer(vehicle).data)
 
                 return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
