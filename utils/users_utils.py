@@ -1,7 +1,9 @@
 import os
 
 import jwt
-from email_validator import EmailNotValidError, validate_email
+from jwt.exceptions import (DecodeError, ExpiredSignatureError,
+                            InvalidAudienceError, InvalidIssuedAtError,
+                            InvalidIssuerError, InvalidSignatureError)
 
 
 def get_user_data_from_token(token: str):
@@ -23,18 +25,9 @@ def decode_token(token: str):
                                                        'verify_iat': True,
                                                        'verify_aud': True})
         return data
-    except ValueError:
-        return {'error': 'Public key is invalid'}
-    except jwt.InvalidIssuerError:
-        return {'error': 'Not authorized issuer'}
-    except jwt.InvalidAudienceError:
-        return {'error': 'Not authorized audience'}
-    except jwt.ExpiredSignatureError:
-        return {'error': 'The signature has expired'}
-    except jwt.InvalidSignatureError:
-        return {'error': 'The signature is invalid'}
-    except jwt.InvalidIssuedAtError:
-        return {'error': 'Issued at date is invalid'}
+    except (DecodeError, ExpiredSignatureError, InvalidIssuerError, InvalidAudienceError, InvalidIssuedAtError,
+            InvalidSignatureError):
+        return {'error': 'Decoding failed'}
 
 
 def extract_user_data(data: str):
@@ -52,7 +45,7 @@ def extract_user_data(data: str):
 
         return user_data
     except KeyError:
-        return {'error': 'User data are not complete'}
+        return {'error': 'User data in token are not complete'}
 
 
 def rewrite_user_type(user_type: str):
@@ -62,12 +55,4 @@ def rewrite_user_type(user_type: str):
         return 'company'
     else:
         return ''
-
-
-def is_email_valid(email: str):
-    try:
-        validate_email(email)
-        return True
-    except EmailNotValidError:
-        return False
 
