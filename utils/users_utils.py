@@ -4,7 +4,6 @@ import jwt
 from jwt.exceptions import (DecodeError, ExpiredSignatureError,
                             InvalidAudienceError, InvalidIssuedAtError,
                             InvalidIssuerError, InvalidSignatureError)
-from email_validator import EmailNotValidError, validate_email
 
 
 def get_user_data_from_token(token: str):
@@ -56,12 +55,4 @@ def rewrite_user_type(user_type: str):
         return 'company'
     else:
         return ''
-
-
-def is_email_valid(email: str):
-    try:
-        validate_email(email)
-        return True
-    except EmailNotValidError:
-        return False
 
