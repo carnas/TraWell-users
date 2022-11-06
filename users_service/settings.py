@@ -36,8 +36,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    "users.apps.UsersConfig",
-    "vehicles.apps.VehiclesConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -46,6 +44,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    'users',
+    'vehicles',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +63,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = ['*']
 
 CELERY_BROKER_URL = 'amqp://root:root@rabbitmq:5672/'
+
 
 ROOT_URLCONF = "users_service.urls"
 

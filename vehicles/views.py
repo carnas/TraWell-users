@@ -1,21 +1,15 @@
 from django.core.exceptions import ValidationError
-import os
-import jwt
 from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.status import HTTP_403_FORBIDDEN
 
-from rest_framework.views import APIView
+from users_service import tasks
 from users.models import User
 from utils import users_utils
 from utils.authorization import is_authorized
 from vehicles.models import Vehicle
-from . import tasks
-from .serializers import VehicleWithoutUserSerializer, VehicleSerializer
-
-from vehicles.models import Vehicle
-
+from .serializers import VehicleSerializer
 from .serializers import VehicleWithoutUserSerializer
 
 
@@ -45,9 +39,8 @@ def user_vehicles(request, user_id):
                 vehicle.save()
                 serializer = VehicleWithoutUserSerializer(vehicle)
 
-                print('Publishing vehicle')
-                tasks.publish_message_n(VehicleSerializer(vehicle).data)
-                tasks.publish_message(VehicleSerializer(vehicle).data)
+                tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.create")
+                # tasks.publish_message(VehicleSerializer(vehicle).data, 'notify.vehicles_create')
 
                 return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
             except (KeyError, ValidationError):
@@ -68,6 +61,8 @@ def vehicle_details(request, car_id):
             if does_belong_to_user:
                 
                 if request.method == 'DELETE':
+                    tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.delete")
+
                     vehicle.delete()
                     return JsonResponse(status=status.HTTP_200_OK, data=f'Car with id={car_id} deleted successfully',
                                         safe=False)
@@ -76,6 +71,8 @@ def vehicle_details(request, car_id):
                     serializer = VehicleWithoutUserSerializer(vehicle, data=request.data, partial=True)
                     if serializer.is_valid():
                         serializer.save()
+                        tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.patch")
+
                         return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                     else:
                         return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data="Wrong parameters", safe=False)

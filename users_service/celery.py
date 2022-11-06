@@ -25,23 +25,10 @@ with app.pool.acquire(block=True) as conn:
     )
     exchange.declare()
 
-    # queue_notify = kombu.Queue(
-    #     name='notifications',
-    #     exchange=exchange,
-    #     routing_key='notify.*',
-    #     channel=conn,
-    #     message_ttl=600,
-    #     queue_arguments={
-    #         'x-queue-type': 'classic'
-    #     },
-    #     durable=True
-    # )
-    # queue_notify.declare()
-
     # queue = kombu.Queue(
     #     name='rides',
     #     exchange=exchange,
-    #     routing_key='key.#',
+    #     routing_key='keys.#',
     #     channel=conn,
     #     message_ttl=600,
     #     queue_arguments={
@@ -50,3 +37,4 @@ with app.pool.acquire(block=True) as conn:
     #     durable=True
     # )
     # queue.declare()
+
