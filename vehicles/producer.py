@@ -1,28 +1,28 @@
-import django
-import os
-import json
-import pika
-import logging
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "users_service.settings")
-django.setup()
-
-
-logger = logging.getLogger(__name__)
-
-parameters = pika.ConnectionParameters(host='host.docker.internal', port=5672,
-                                       heartbeat=600, blocked_connection_timeout=300)
-connection = pika.BlockingConnection(parameters)
-
-channel = connection.channel()
-
-channel.queue_declare(queue='vehicles')
-
-
-def publish(method, body):
-    properties = pika.BasicProperties(method)
-    channel.basic_publish(exchange='', routing_key='vehicles', body=json.dumps(body), properties=properties)
-    print('send message')
-    print(json.dumps(body))
-    logger.debug("Message was sent")
-
+# import django
+# import os
+# import json
+# import pika
+# import logging
+#
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "users_service.settings")
+# django.setup()
+#
+#
+# logger = logging.getLogger(__name__)
+#
+# parameters = pika.ConnectionParameters(host='host.docker.internal', port=5672,
+#                                        heartbeat=600, blocked_connection_timeout=300)
+# connection = pika.BlockingConnection(parameters)
+#
+# channel = connection.channel()
+#
+# channel.queue_declare(queue='vehicles')
+#
+#
+# def publish(method, body):
+#     properties = pika.BasicProperties(method)
+#     channel.basic_publish(exchange='', routing_key='vehicles', body=json.dumps(body), properties=properties)
+#     print('send message')
+#     print(json.dumps(body))
+#     logger.debug("Message was sent")
+#

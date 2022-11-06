@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view
 
-from .producer import publish
+from . import tasks
 from .serializers import UserSerializer
 from users.models import User
 from utils.authorization import is_authorized
@@ -52,7 +52,8 @@ def check_user(request):
                     if serializer.is_valid():
                         serializer.save()
 
-                        publish('user_updated', serializer.data)
+                        tasks.publish_message(serializer.data)
+                        tasks.publish_message_n(serializer.data)
 
                         return JsonResponse(status=status.HTTP_200_OK, data=serializer.data)
                     else:
@@ -68,7 +69,8 @@ def check_user(request):
                         new_user.save()
                         serializer = UserSerializer(new_user)
 
-                        publish('user_created', serializer.data)
+                        tasks.publish_message(serializer.data)
+                        tasks.publish_message_n(serializer.data)
 
                         return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                     except ValidationError:

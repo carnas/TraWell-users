@@ -1,15 +1,13 @@
 from django.core.exceptions import ValidationError
-from django.shortcuts import render
-from rest_framework.views import APIView
-
-from .producer import publish
-from .serializers import VehicleWithoutUserSerializer, VehicleSerializer
-from users.models import User
-from vehicles.models import Vehicle
-from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from rest_framework import status
+from rest_framework.decorators import api_view
+
+from users.models import User
 from utils.authorization import is_authorized
+from vehicles.models import Vehicle
+from . import tasks
+from .serializers import VehicleWithoutUserSerializer, VehicleSerializer
 
 
 @api_view(['GET', 'POST'])
@@ -35,8 +33,8 @@ def user_vehicles(request, user_id):
                 vehicle.save()
                 serializer = VehicleWithoutUserSerializer(vehicle)
 
-
-                publish('vehicle_created', VehicleSerializer(vehicle).data)
+                print('Publishing vehicle')
+                tasks.publish_message(VehicleSerializer(vehicle).data)
 
                 return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
             except KeyError:
