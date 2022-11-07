@@ -6,7 +6,7 @@ from users_service.celery import app
 
 
 @shared_task(name='rides')
-def publish_message(message, title):
+def publish_message(message, title, queue, routing_key):
     body = {
         'title': title,
         'message': message
@@ -15,5 +15,6 @@ def publish_message(message, title):
         producer.publish(
             body,
             exchange='trawell_exchange',
-            routing_key='keys.users',
+            queue=queue,
+            routing_key=routing_key,
         )

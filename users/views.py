@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 from users.models import User
+from users_service.celery import queue_rides, queue_notify
 from utils import users_utils
 from utils.authorization import is_authorized
 from users_service import tasks
@@ -36,7 +37,8 @@ def user_details(request, user_id):
                         serializer.save()
                         serializer = UserSerializer(user)
 
-                        tasks.publish_message(serializer.data, 'users.patch')
+                        tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
+                        tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
 
                         return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                     else:
@@ -68,7 +70,8 @@ def check_user(request):
                 if serializer.is_valid():
                     serializer.save()
 
-                    tasks.publish_message(serializer.data, 'users.update')
+                    tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
+                    tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
 
                     return JsonResponse(status=status.HTTP_200_OK, data=serializer.data)
                 else:
@@ -83,7 +86,8 @@ def check_user(request):
                                                    instagram=user_data['instagram'], avatar=user_data['avatar'])
                     new_user.save()
                     serializer = UserSerializer(new_user)
-                    tasks.publish_message(serializer.data, 'users.create')
+                    tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
+                    tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
 
                     return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                 except ValidationError:

@@ -6,6 +6,7 @@ from rest_framework.status import HTTP_403_FORBIDDEN
 
 from users_service import tasks
 from users.models import User
+from users_service.celery import queue_rides, queue_notify
 from utils import users_utils
 from utils.authorization import is_authorized
 from vehicles.models import Vehicle
@@ -39,8 +40,7 @@ def user_vehicles(request, user_id):
                 vehicle.save()
                 serializer = VehicleWithoutUserSerializer(vehicle)
 
-                tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.create")
-                # tasks.publish_message(VehicleSerializer(vehicle).data, 'notify.vehicles_create')
+                tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.create", queue_rides, 'send')
 
                 return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
             except (KeyError, ValidationError):
@@ -61,7 +61,7 @@ def vehicle_details(request, car_id):
             if does_belong_to_user:
                 
                 if request.method == 'DELETE':
-                    tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.delete")
+                    tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.delete", queue_rides, 'send')
 
                     vehicle.delete()
                     return JsonResponse(status=status.HTTP_200_OK, data=f'Car with id={car_id} deleted successfully',
@@ -71,7 +71,7 @@ def vehicle_details(request, car_id):
                     serializer = VehicleWithoutUserSerializer(vehicle, data=request.data, partial=True)
                     if serializer.is_valid():
                         serializer.save()
-                        tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.patch")
+                        tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.patch", queue_rides, 'send')
 
                         return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                     else:
