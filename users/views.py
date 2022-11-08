@@ -53,21 +53,8 @@ def check_user(request):
         if 'error' not in user_data.keys():
             email = user_data['email']
             try:
-                user_with_email = User.objects.get(email=email)
-                # Get data that can be updated
-                user_data = {'first_name': user_data['first_name'],
-                             'last_name': user_data["last_name"],
-                             'date_of_birth': user_data['date_of_birth'],
-                             'facebook': user_data['facebook'],
-                             'instagram': user_data['instagram'],
-                             'avatar': user_data['avatar']
-                             }
-                serializer = UserSerializer(user_with_email, data=user_data, partial=True)
-                if serializer.is_valid():
-                    serializer.save()
-                    return JsonResponse(status=status.HTTP_200_OK, data=serializer.data)
-                else:
-                    return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data="Wrong parameters", safe=False)
+                User.objects.get(email=email)
+                return JsonResponse(status=status.HTTP_200_OK, data='User in database', safe=False)
             except User.DoesNotExist:
                 try:
                     new_user = User.objects.create(first_name=user_data['first_name'],
