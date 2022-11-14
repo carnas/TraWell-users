@@ -1,9 +1,6 @@
 import os
 
 import jwt
-from jwt.exceptions import (DecodeError, ExpiredSignatureError,
-                            InvalidAudienceError, InvalidIssuedAtError,
-                            InvalidIssuerError, InvalidSignatureError)
 
 from utils import users_utils
 
