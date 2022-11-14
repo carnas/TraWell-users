@@ -1,13 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from django.shortcuts import render
-from rest_framework import permissions, status
+from rest_framework import status
 from rest_framework.decorators import api_view
-from utils import users_utils
-from utils.authorization import is_authorized
 
 from users.models import User
-
+from users_service.celery import queue_rides, queue_notify
+from utils import users_utils
+from utils.authorization import is_authorized
+from users_service import tasks
 from .serializers import UserSerializer, UserToUpdateSerializer
 
 
@@ -36,6 +36,10 @@ def user_details(request, user_id):
                     if serializer.is_valid():
                         serializer.save()
                         serializer = UserSerializer(user)
+
+                        tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
+                        tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
+
                         return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                     else:
                         return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data="Wrong parameters", safe=False)
@@ -65,6 +69,9 @@ def check_user(request):
                                                    instagram=user_data['instagram'], avatar=user_data['avatar'])
                     new_user.save()
                     serializer = UserSerializer(new_user)
+                    tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
+                    tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
+
                     return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                 except ValidationError:
                     return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data="Wrong parameters", safe=False)
