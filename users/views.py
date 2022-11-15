@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 from users.models import User
-from users_service.celery import queue_rides, queue_notify
+from users_service.celery import queue_rides, queue_notify, queue_reviews
 from utils import users_utils
 from utils.authorization import is_authorized
 from users_service import tasks
@@ -39,6 +39,7 @@ def user_details(request, user_id):
 
                         tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
                         tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
+                        tasks.publish_message(serializer.data, 'users', queue_reviews, 'review')
 
                         return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                     else:
@@ -57,7 +58,12 @@ def check_user(request):
         if 'error' not in user_data.keys():
             email = user_data['email']
             try:
-                User.objects.get(email=email)
+                user = User.objects.get(email=email)
+
+                tasks.publish_message(UserSerializer(user).data, 'users', queue_notify, 'notify')
+                tasks.publish_message(UserSerializer(user).data, 'users', queue_rides, 'send')
+                tasks.publish_message(UserSerializer(user).data, 'users', queue_reviews, 'review')
+
                 return JsonResponse(status=status.HTTP_200_OK, data='User in database', safe=False)
             except User.DoesNotExist:
                 try:
@@ -71,6 +77,7 @@ def check_user(request):
                     serializer = UserSerializer(new_user)
                     tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
                     tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
+                    tasks.publish_message(serializer.data, 'users', queue_reviews, 'review')
 
                     return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                 except ValidationError:
