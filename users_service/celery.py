@@ -32,7 +32,7 @@ with app.pool.acquire(block=True) as conn:
         channel=conn,
         message_ttl=600,
         queue_arguments={
-            'x-queue-type': 'classic'
+            'x-queue_rides-type': 'classic'
         },
         durable=True
     )
@@ -45,9 +45,22 @@ with app.pool.acquire(block=True) as conn:
         channel=conn,
         message_ttl=600,
         queue_arguments={
-            'x-queue-type': 'classic'
+            'x-queue_rides-type': 'classic'
         },
         durable=True
     )
     queue_notify.declare()
+
+    queue_reviews = kombu.Queue(
+        name='reviews',
+        exchange=exchange,
+        routing_key='review',
+        channel=conn,
+        message_ttl=600,
+        queue_arguments={
+            'x-queue_rides-type': 'classic'
+        },
+        durable=True
+    )
+    queue_reviews.declare()
 
