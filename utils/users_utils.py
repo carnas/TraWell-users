@@ -49,9 +49,9 @@ def extract_user_data(data: str):
 
 
 def rewrite_user_type(user_type: str):
-    if user_type == 'Private Account':
+    if user_type == 'Private User':
         return 'private'
-    elif user_type == 'Company Account':
+    elif user_type == 'Company User':
         return 'company'
     else:
         return ''
