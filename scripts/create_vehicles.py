@@ -12,5 +12,4 @@ def create(amount):
     for vehicle in range(amount):
         user_index = random.choice(range(len(users)))
         vehicle = VehicleFactory(user=users[user_index])
-        serializer = VehicleSerializer(vehicle)
-        tasks.publish_message(serializer.data, "vehicles.create", queue_rides, 'send')
+        tasks.publish_message(VehicleSerializer(vehicle).data, "vehicles.create", queue_rides, 'send')
