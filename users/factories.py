@@ -1,5 +1,4 @@
 import datetime
-from datetime import timezone
 
 import factory.django
 import factory.fuzzy
@@ -21,9 +20,9 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker('first_name', locale='PL')
     last_name = factory.Faker('last_name', locale='PL')
     email = factory.Faker('safe_email')
-    date_of_birth = factory.fuzzy.FuzzyDateTime(
-        datetime.datetime(1901, 1, 1, tzinfo=datetime.timezone.utc),
-        datetime.datetime(2010, 12, 31, 20, tzinfo=datetime.timezone.utc)
+    date_of_birth = factory.fuzzy.FuzzyDate(
+        datetime.date(1901, 1, 1),
+        datetime.date(2010, 12, 31)
     )
     avg_rate = factory.Faker('pydecimal', left_digits=1, right_digits=2, min_value=1, max_value=5)
     user_type = factory.Faker('random_element', elements=user_types)
