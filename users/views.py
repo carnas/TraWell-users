@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 from users.models import User
-from users_service.celery import queue_rides, queue_notify, queue_reviews
+from users_service.celery import queue_rides, queue_notify, queue_reviews, queue_history
 from utils import users_utils
 from utils.authorization import is_authorized
 from users_service import tasks
@@ -40,6 +40,7 @@ def user_details(request, user_id):
                         tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
                         tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
                         tasks.publish_message(serializer.data, 'users', queue_reviews, 'review')
+                        tasks.publish_message(serializer.data, 'users', queue_history, 'history')
 
                         return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                     else:
@@ -63,6 +64,7 @@ def check_user(request):
                 tasks.publish_message(UserSerializer(user).data, 'users', queue_notify, 'notify')
                 tasks.publish_message(UserSerializer(user).data, 'users', queue_rides, 'send')
                 tasks.publish_message(UserSerializer(user).data, 'users', queue_reviews, 'review')
+                tasks.publish_message(UserSerializer(user).data, 'users', queue_history, 'history')
 
                 return JsonResponse(status=status.HTTP_200_OK, data='User in database', safe=False)
             except User.DoesNotExist:
@@ -78,6 +80,7 @@ def check_user(request):
                     tasks.publish_message(serializer.data, 'users', queue_notify, 'notify')
                     tasks.publish_message(serializer.data, 'users', queue_rides, 'send')
                     tasks.publish_message(serializer.data, 'users', queue_reviews, 'review')
+                    tasks.publish_message(serializer.data, 'users', queue_history, 'history')
 
                     return JsonResponse(status=status.HTTP_201_CREATED, data=serializer.data)
                 except ValidationError:
