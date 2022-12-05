@@ -43,6 +43,19 @@ with app.pool.acquire(block=True) as conn:
     )
     queue_users.declare()
 
+    queue_history = kombu.Queue(
+        name='history',
+        exchange=exchange,
+        routing_key='history',
+        channel=conn,
+        message_ttl=600,
+        queue_arguments={
+            'x-queue_rides-type': 'classic'
+        },
+        durable=True
+    )
+    queue_history.declare()
+
     queue_rides = kombu.Queue(
         name='rides',
         exchange=exchange,
